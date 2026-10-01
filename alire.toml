@@ -1,0 +1,16 @@
+name = "warden"
+description = "SPARK security proxy for Modbus/TCP"
+version = "0.1.0-dev"
+licenses = "BSD-3-Clause"
+
+authors = ["GNAT Academic Program"]
+maintainers = ["Olivier Henley <olivier.henley@gmail.com>"]
+maintainers-logins = ["ohenley"]
+website = "https://github.com/GNAT-Academic-Program/warden"
+tags = ["spark", "security", "modbus", "ics", "proxy"]
+
+executables = ["warden"]
+
+[[depends-on]]
+gnat_native = "^15"        # compiler for your own machine (no board here)
+gnatprove = "^15.1.0"      # SPARK prover

@@ -1,0 +1,43 @@
+# Builds the seed and runs the gauntlet on Linux and on Windows, so that a
+# change that breaks one platform shows up here before it hits a teammate.
+
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  seed:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: alire-project/setup-alire@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the proxy
+        run: alr -n build
+
+      # Must always pass: normal traffic goes through, garbage does not.
+      - name: Baseline tests
+        run: python tools/gauntlet.py --baseline
+
+      # The scoreboard. Allowed to fail while attacks still get through.
+      # Once the gauntlet is green, delete `continue-on-error` to keep it green.
+      - name: Gauntlet
+        continue-on-error: true
+        run: python tools/gauntlet.py
+
+      - name: Prove
+        if: runner.os == 'Linux'
+        run: alr -n exec -- gnatprove -P warden.gpr

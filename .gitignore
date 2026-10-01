@@ -1,0 +1,6 @@
+/alire/
+/config/
+/obj/
+/bin/
+__pycache__/
+*.pyc

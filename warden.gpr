@@ -1,0 +1,34 @@
+--  The proxy.
+--
+--  Source directories mirror the architecture (see ARCHITECTURE.md):
+--    src/core   decisions: decode, policy, gate     SPARK, no I/O
+--    src/net    sockets, settings, journal, main    the outside world
+
+with "config/warden_config.gpr";
+
+project Warden is
+
+   for Source_Dirs use ("src/core", "src/net");
+   for Object_Dir use "obj/" & Warden_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Exec_Dir use "bin";
+   for Main use ("warden_main.adb");
+
+   package Builder is
+      for Executable ("warden_main.adb") use "warden";
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("Ada") use Warden_Config.Ada_Compiler_Switches;
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es");
+   end Binder;
+
+   package Prove is
+      --  `alr exec -- gnatprove -P warden.gpr` picks these up.
+      for Proof_Switches ("Ada") use ("--level=1", "--report=all");
+   end Prove;
+
+end Warden;
