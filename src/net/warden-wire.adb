@@ -92,12 +92,47 @@ is
    is
       Buffer : Stream_Element_Array (1 .. Max_Read);
       Last   : Stream_Element_Offset;
+      Next_Byte      : Stream_Element_Offset;
+      Expected_Total : Natural;
+
    begin
       Data := (others => 0);
       Length := 0;
       Alive := False;
+      Next_Byte := Buffer'First;
+      Expected_Total := 0;
 
-      Receive_Socket (Client, Buffer, Last);
+      while Next_Byte <= 6 loop
+         Receive_Socket (Client, Buffer (Next_Byte .. 6), Last);
+
+         if Last < Next_Byte then
+            return;
+         end if;
+
+         Next_Byte := Last + 1;
+      end loop;
+
+      Expected_Total :=
+      6 + Natural (Buffer (5)) * 256 + Natural (Buffer (6));
+
+      if Expected_Total < 8
+         or else Expected_Total > Natural (Max_Read)
+      then
+         return;
+      end if;
+
+      while Next_Byte <= Stream_Element_Offset (Expected_Total) loop
+         Receive_Socket
+            (Client,
+            Buffer (Next_Byte .. Stream_Element_Offset (Expected_Total)),
+            Last);
+
+         if Last < Next_Byte then
+            return;
+         end if;
+
+         Next_Byte := Last + 1;
+      end loop;
 
       if Last >= Buffer'First then
          for I in Buffer'First .. Last loop
