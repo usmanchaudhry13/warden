@@ -3,7 +3,7 @@ with Warden.Policy;
 package body Warden.Gate with
   SPARK_Mode
 is
-
+   use type Byte;
    use type U16;
 
    -------------
@@ -35,6 +35,26 @@ is
       if Fields.Protocol /= 0 then
          Result := Bad_Protocol;
          return;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Holding_Registers
+         or else Fields.Function_Code = Modbus.Read_Input_Registers
+      then
+         if Input'Length /= 12 then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Holding_Registers
+       or else Fields.Function_Code = Modbus.Read_Input_Registers
+      then
+         if Natural (Input (Input'First + 10)) * 256
+         + Natural (Input (Input'First + 11)) not in 1 .. 125
+         then
+            Result := Denied;
+            return;
+         end if;
       end if;
 
       --  OPEN: the seed stops checking the message here. It assumes that
