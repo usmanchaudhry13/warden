@@ -63,6 +63,21 @@ is
       --  wrong, and the gauntlet has an attack for each.
 
       --  2. Is it allowed here?
+
+      if Fields.Function_Code = Modbus.Write_Single_Register then
+         if Input'Length /= 12 then
+            Result := Denied;
+            return;
+         end if;
+
+         if Natural (Input (Input'First + 8)) * 256
+            + Natural (Input (Input'First + 9)) /= 0
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
       if not Policy.Permits (Fields) then
          Result := Denied;
          return;
