@@ -78,6 +78,23 @@ is
          end if;
       end if;
 
+      if Fields.Function_Code = Modbus.Write_Multiple_Registers then
+         if Input'Length /= 15 then
+            Result := Denied;
+            return;
+         end if;
+
+         if Natural (Input (Input'First + 8)) * 256
+            + Natural (Input (Input'First + 9)) /= 0
+            or else Natural (Input (Input'First + 10)) * 256
+            + Natural (Input (Input'First + 11)) /= 1
+            or else Input (Input'First + 12) /= 2
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
       if not Policy.Permits (Fields) then
          Result := Denied;
          return;
