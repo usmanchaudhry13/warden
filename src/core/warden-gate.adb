@@ -95,6 +95,31 @@ is
          end if;
       end if;
 
+      if Fields.Function_Code = Modbus.Write_Single_Coil then
+         if Input'Length /= 12 then
+            Result := Denied;
+            return;
+         end if;
+
+         if Natural (Input (Input'First + 8)) * 256
+            + Natural (Input (Input'First + 9)) not in 0 .. 1
+         then
+            Result := Denied;
+            return;
+         end if;
+         if Input (Input'First + 11) /= 0 then
+            Result := Denied;
+            return;
+         end if;
+
+         if Input (Input'First + 10) /= 0 then
+            if Input (Input'First + 10) /= 16#FF# then
+               Result := Denied;
+               return;
+            end if;
+         end if;
+      end if;
+
       if not Policy.Permits (Fields) then
          Result := Denied;
          return;
