@@ -76,6 +76,13 @@ is
             Result := Denied;
             return;
          end if;
+
+         if Natural (Input (Input'First + 10)) * 256
+            + Natural (Input (Input'First + 11)) > 1000
+         then
+            Result := Denied;
+            return;
+         end if;
       end if;
 
       if Fields.Function_Code = Modbus.Write_Multiple_Registers then
@@ -89,6 +96,13 @@ is
             or else Natural (Input (Input'First + 10)) * 256
             + Natural (Input (Input'First + 11)) /= 1
             or else Input (Input'First + 12) /= 2
+         then
+            Result := Denied;
+            return;
+         end if;
+
+         if Natural (Input (Input'First + 13)) * 256
+            + Natural (Input (Input'First + 14)) > 1000
          then
             Result := Denied;
             return;
