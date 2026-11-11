@@ -37,8 +37,10 @@ is
          return;
       end if;
 
-      if Fields.Function_Code = Modbus.Read_Holding_Registers
-         or else Fields.Function_Code = Modbus.Read_Input_Registers
+      if Fields.Function_Code = Modbus.Read_Coils
+        or else Fields.Function_Code = Modbus.Read_Discrete_Inputs
+        or else Fields.Function_Code = Modbus.Read_Holding_Registers
+        or else Fields.Function_Code = Modbus.Read_Input_Registers
       then
          if Input'Length /= 12 then
             Result := Denied;
@@ -51,6 +53,52 @@ is
       then
          if Natural (Input (Input'First + 10)) * 256
          + Natural (Input (Input'First + 11)) not in 1 .. 125
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Coils
+        or else Fields.Function_Code = Modbus.Read_Discrete_Inputs
+      then
+         if Natural (Input (Input'First + 10)) * 256
+           + Natural (Input (Input'First + 11)) not in 1 .. 2000
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Coils
+        or else Fields.Function_Code = Modbus.Read_Discrete_Inputs
+      then
+         if Natural (Input (Input'First + 8)) * 256
+           + Natural (Input (Input'First + 9))
+           + Natural (Input (Input'First + 10)) * 256
+           + Natural (Input (Input'First + 11)) > 2
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Input_Registers then
+         if Natural (Input (Input'First + 8)) * 256
+           + Natural (Input (Input'First + 9))
+           + Natural (Input (Input'First + 10)) * 256
+           + Natural (Input (Input'First + 11)) > 3
+         then
+            Result := Denied;
+            return;
+         end if;
+      end if;
+
+      if Fields.Function_Code = Modbus.Read_Holding_Registers then
+         if Natural (Input (Input'First + 8)) * 256
+           + Natural (Input (Input'First + 9))
+           + Natural (Input (Input'First + 10)) * 256
+           + Natural (Input (Input'First + 11)) > 16
          then
             Result := Denied;
             return;
