@@ -6,7 +6,7 @@ Modbus is a very simple industrial protocol. It lets software read and write val
 
 If a computer can reach the controller, it can usually ask the controller to do things.
 
-In this project, we cannot change the controller. Instead, we put **Warden** in front of it.
+In this project, we cannot change the controller. Instead, we put **Warden** in front of it. --Serves as a proxy to authenticate requests or perform security validation before passing controller request onto pump station. Should only have incoming connections open on port 5021 if any, deny and report. Otherwise, outgoing reqquests from port 5020 to pump station
 
 Warden is a proxy:
 

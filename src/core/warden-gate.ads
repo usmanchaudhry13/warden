@@ -25,7 +25,8 @@ is
       Too_Short,
       Too_Long,
       Bad_Protocol,
-      Denied);
+      Denied,
+      Invalid_Message); -- Added when Modbus.Validate returns false
    --  OPEN: one value per reason to refuse a request. The seed knows few.
    --  The gauntlet (tools/gauntlet.py) shows what still gets through.
 
