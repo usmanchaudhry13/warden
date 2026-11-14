@@ -20,7 +20,7 @@ is
       Request := (Valid => False, Length => 0, Data => (others => 0));
 
       --  1. Can this be a Modbus/TCP message at all?
-      if Input'Length < Modbus.Min_Message then
+      if Input'Length < 12 then
          Result := Too_Short;
          return;
       end if;
@@ -49,11 +49,9 @@ is
       end if;
 
       if Fields.Function_Code = Modbus.Read_Holding_Registers
-       or else Fields.Function_Code = Modbus.Read_Input_Registers
+        or else Fields.Function_Code = Modbus.Read_Input_Registers
       then
-         if Natural (Input (Input'First + 10)) * 256
-         + Natural (Input (Input'First + 11)) not in 1 .. 125
-         then
+         if Fields.Quantity not in 1 .. 125 then
             Result := Denied;
             return;
          end if;
@@ -62,9 +60,7 @@ is
       if Fields.Function_Code = Modbus.Read_Coils
         or else Fields.Function_Code = Modbus.Read_Discrete_Inputs
       then
-         if Natural (Input (Input'First + 10)) * 256
-           + Natural (Input (Input'First + 11)) not in 1 .. 2000
-         then
+         if Fields.Quantity not in 1 .. 2000 then
             Result := Denied;
             return;
          end if;
@@ -73,33 +69,21 @@ is
       if Fields.Function_Code = Modbus.Read_Coils
         or else Fields.Function_Code = Modbus.Read_Discrete_Inputs
       then
-         if Natural (Input (Input'First + 8)) * 256
-           + Natural (Input (Input'First + 9))
-           + Natural (Input (Input'First + 10)) * 256
-           + Natural (Input (Input'First + 11)) > 2
-         then
+         if Natural (Fields.Address) + Natural (Fields.Quantity) > 2 then
             Result := Denied;
             return;
          end if;
       end if;
 
       if Fields.Function_Code = Modbus.Read_Input_Registers then
-         if Natural (Input (Input'First + 8)) * 256
-           + Natural (Input (Input'First + 9))
-           + Natural (Input (Input'First + 10)) * 256
-           + Natural (Input (Input'First + 11)) > 3
-         then
+         if Natural (Fields.Address) + Natural (Fields.Quantity) > 3 then
             Result := Denied;
             return;
          end if;
       end if;
 
       if Fields.Function_Code = Modbus.Read_Holding_Registers then
-         if Natural (Input (Input'First + 8)) * 256
-           + Natural (Input (Input'First + 9))
-           + Natural (Input (Input'First + 10)) * 256
-           + Natural (Input (Input'First + 11)) > 16
-         then
+         if Natural (Fields.Address) + Natural (Fields.Quantity) > 16 then
             Result := Denied;
             return;
          end if;

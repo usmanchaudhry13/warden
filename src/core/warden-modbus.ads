@@ -43,14 +43,15 @@ is
       Length        : U16;
       Unit          : Byte;
       Function_Code : Byte;
+      Address       : U16;
+      Quantity      : U16;
    end record;
-   --  OPEN: the seed decodes the header and the function code only.
-   --  Addresses, quantities and values are in the bytes that follow, and
-   --  nothing looks at them yet.
+   --  For read requests, Address and Quantity describe the requested range.
+   --  The gate checks whether that range is permitted.
 
    function Decode (Raw : Byte_Array) return Fields with
      Global => null,
-     Pre    => Raw'Length >= Min_Message;
+     Pre    => Raw'Length >= 12;
    --  The fields of the message that starts at Raw'First.
 
 end Warden.Modbus;

@@ -9,7 +9,7 @@ is
      (Interfaces.Shift_Left (U16 (Raw (Raw'First + At_Offset)), 8)
       or U16 (Raw (Raw'First + At_Offset + 1)))
    with
-     Pre => Raw'Length >= Min_Message and then At_Offset <= 4;
+     Pre => Raw'Length >= 12 and then At_Offset <= 10;
 
    ------------
    -- Decode --
@@ -20,6 +20,8 @@ is
       Protocol      => Get_U16 (Raw, 2),
       Length        => Get_U16 (Raw, 4),
       Unit          => Raw (Raw'First + 6),
-      Function_Code => Raw (Raw'First + 7));
+      Function_Code => Raw (Raw'First + 7),
+      Address       => Get_U16 (Raw, 8),
+      Quantity      => Get_U16 (Raw, 10));
 
 end Warden.Modbus;
